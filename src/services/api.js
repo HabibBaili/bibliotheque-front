@@ -22,4 +22,5 @@ export const api = {
     getEmprunts: () => axios.get(`${API_URL}/emprunts`),
     createEmprunt: (data) => axios.post(`${API_URL}/emprunts`, data),
     deleteEmprunt: (id) => axios.delete(`${API_URL}/emprunts/${id}`),
+    retournerEmprunt: (id) => axios.put(`${API_URL}/emprunts/${id}/retour`),
 };

@@ -56,7 +56,7 @@ function Emprunts() {
             setErrors({});
             loadAll();
         } catch (err) {
-            alert("Erreur création emprunt !");
+            alert(err.response?.data?.message || "Erreur création emprunt ! (Peut-être livre indisponible)");
             console.error(err);
         }
     };
@@ -68,6 +68,17 @@ function Emprunts() {
                 loadAll();
             } catch (err) {
                 alert("Erreur suppression !");
+            }
+        }
+    };
+
+    const handleRetour = async (id) => {
+        if (window.confirm('Marquer cet emprunt comme retourné ?')) {
+            try {
+                await api.retournerEmprunt(id);
+                loadAll();
+            } catch (err) {
+                alert("Erreur lors du retour !");
             }
         }
     };
@@ -145,12 +156,13 @@ function Emprunts() {
                             <th>Adhérent</th>
                             <th>Date Emprunt</th>
                             <th>Retour Prévu</th>
+                            <th>Retour Effectif</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
                         <tbody>
                         {emprunts.length === 0 ? (
-                            <tr><td colSpan="6" className="empty-state">Aucun emprunt</td></tr>
+                            <tr><td colSpan="7" className="empty-state">Aucun emprunt</td></tr>
                         ) : (
                             emprunts.map(em => (
                                 <tr key={em.idE}>
@@ -159,7 +171,11 @@ function Emprunts() {
                                     <td>{em.adherent ? em.adherent.nom + ' ' + em.adherent.prenom : 'Inconnu'}</td>
                                     <td>{em.dateE}</td>
                                     <td>{em.dateRetourPrevue}</td>
+                                    <td>{em.dateRetourEffective || '-'}</td>
                                     <td>
+                                        {!em.dateRetourEffective && (
+                                            <button className="btn btn-submit" style={{marginRight: '5px', backgroundColor: '#28a745'}} onClick={() => handleRetour(em.idE)}>Retourner</button>
+                                        )}
                                         <button className="btn btn-delete" onClick={() => handleDelete(em.idE)}>Supprimer</button>
                                     </td>
                                 </tr>

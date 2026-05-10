@@ -5,7 +5,7 @@ import { api } from '../services/api';
 function Livres() {
     const [livres, setLivres] = useState([]);
     const [bibliotheques, setBibliotheques] = useState([]);
-    const [form, setForm] = useState({ titre: '', auteur: '', isbn: '', anneePublication: '', bibliothequeId: '' });
+    const [form, setForm] = useState({ titre: '', auteur: '', isbn: '', anneePublication: '', bibliothequeId: '', quantite: 1 });
     const [showForm, setShowForm] = useState(false);
 
     useEffect(() => {
@@ -41,7 +41,7 @@ function Livres() {
                 bibliotheque: form.bibliothequeId ? { idB: parseInt(form.bibliothequeId) } : null
             };
             await api.createLivre(dataToSubmit);
-            setForm({ titre: '', auteur: '', isbn: '', anneePublication: '', bibliothequeId: '' });
+            setForm({ titre: '', auteur: '', isbn: '', anneePublication: '', bibliothequeId: '', quantite: 1 });
             setShowForm(false);
             loadLivres();
         } catch (err) {
@@ -91,6 +91,10 @@ function Livres() {
                                 <input type="number" value={form.anneePublication} onChange={e => setForm({...form, anneePublication: e.target.value})} required placeholder="2024" />
                             </div>
                             <div className="form-group">
+                                <label>Quantité</label>
+                                <input type="number" min="1" value={form.quantite} onChange={e => setForm({...form, quantite: e.target.value})} required placeholder="1" />
+                            </div>
+                            <div className="form-group">
                                 <label>Bibliothèque</label>
                                 <select value={form.bibliothequeId} onChange={e => setForm({...form, bibliothequeId: e.target.value})} required>
                                     <option value="">Sélectionner une bibliothèque</option>
@@ -113,13 +117,15 @@ function Livres() {
                             <th>Auteur</th>
                             <th>ISBN</th>
                             <th>Année</th>
+                            <th>Quantité</th>
+                            <th>Disponible</th>
                             <th>Bibliothèque</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
                         <tbody>
                         {list.length === 0 ? (
-                            <tr><td colSpan="7" className="empty-state">Aucun livre</td></tr>
+                            <tr><td colSpan="9" className="empty-state">Aucun livre</td></tr>
                         ) : (
                             list.map(l => (
                                 <tr key={l.idLivre}>
@@ -128,6 +134,8 @@ function Livres() {
                                     <td>{l.auteur}</td>
                                     <td>{l.isbn}</td>
                                     <td>{l.anneePublication}</td>
+                                    <td>{l.quantite}</td>
+                                    <td>{l.quantiteDisponible}</td>
                                     <td>{l.bibliotheque ? l.bibliotheque.nomB : '-'}</td>
                                     <td>
                                         <button className="btn btn-delete" onClick={() => handleDelete(l.idLivre)}>Supprimer</button>
