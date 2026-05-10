@@ -1,16 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { FaUsers } from 'react-icons/fa';
+import { FaUsers, FaSearch, FaEnvelope } from 'react-icons/fa';
 import { api } from '../services/api';
 
 function Adherents() {
     const [adherents, setAdherents] = useState([]);
-    const [form, setForm] = useState({ nom: '', prenom: '', adresse: '', tel: '' });
+    const [form, setForm] = useState({ nom: '', prenom: '', adresse: '', tel: '', email: '' });
     const [showForm, setShowForm] = useState(false);
     const [editingId, setEditingId] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [error, setError] = useState('');
 
     useEffect(() => {
-        loadAdherents();
-    }, []);
+        if (searchQuery.trim()) {
+            const delayDebounceFn = setTimeout(() => {
+                handleSearch();
+            }, 300);
+            return () => clearTimeout(delayDebounceFn);
+        } else {
+            loadAdherents();
+        }
+    }, [searchQuery]);
 
     const loadAdherents = async () => {
         try {
@@ -22,27 +31,56 @@ function Adherents() {
         }
     };
 
+    const handleSearch = async () => {
+        try {
+            const res = await api.searchAdherents(searchQuery);
+            setAdherents(Array.isArray(res.data) ? res.data : []);
+        } catch (err) {
+            console.error("Erreur recherche:", err);
+        }
+    };
+
+    const validateEmail = (email) => {
+        return String(email)
+            .toLowerCase()
+            .match(
+                /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+            );
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError('');
+
+        if (!validateEmail(form.email)) {
+            setError("Format d'email invalide");
+            return;
+        }
+
         try {
             if (editingId) {
                 await api.updateAdherent(editingId, form);
             } else {
                 await api.createAdherent(form);
             }
-            setForm({ nom: '', prenom: '', adresse: '', tel: '' });
+            setForm({ nom: '', prenom: '', adresse: '', tel: '', email: '' });
             setShowForm(false);
             setEditingId(null);
             loadAdherents();
         } catch (err) {
-            alert("Erreur enregistrement adhérent !");
+            if (err.response && (err.response.status === 409 || err.response.status === 400)) {
+                setError("Email invalide ou déjà utilisé");
+            } else {
+                alert("Erreur enregistrement adhérent !");
+            }
         }
     };
 
     const handleEdit = (a) => {
-        setForm({ nom: a.nom, prenom: a.prenom, adresse: a.adresse, tel: a.tel });
+        setForm({ nom: a.nom, prenom: a.prenom, adresse: a.adresse, tel: a.tel, email: a.email || '' });
         setEditingId(a.idA);
         setShowForm(true);
+        setError('');
     };
 
     const handleDelete = async (id) => {
@@ -63,18 +101,39 @@ function Adherents() {
             <div className="card">
                 <h2 className="card-title"><FaUsers /> Adhérents</h2>
 
-                <button className="btn btn-add" onClick={() => {
-                    if (showForm) {
-                        setForm({ nom: '', prenom: '', adresse: '', tel: '' });
-                        setEditingId(null);
-                    }
-                    setShowForm(!showForm);
-                }}>
-                    {showForm ? 'Annuler' : '+ Nouvel Adhérent'}
-                </button>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', gap: '1rem', flexWrap: 'wrap' }}>
+                    <button className="btn btn-add" style={{ marginBottom: 0 }} onClick={() => {
+                        if (showForm) {
+                            setForm({ nom: '', prenom: '', adresse: '', tel: '', email: '' });
+                            setEditingId(null);
+                            setError('');
+                        }
+                        setShowForm(!showForm);
+                    }}>
+                        {showForm ? 'Annuler' : '+ Nouvel Adhérent'}
+                    </button>
+
+                    <div className="search-bar" style={{ flex: 1, maxWidth: '400px', position: 'relative' }}>
+                        <FaSearch style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--gray)' }} />
+                        <input 
+                            type="text" 
+                            placeholder="Rechercher par nom, téléphone ou email..." 
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            style={{ 
+                                width: '100%', 
+                                padding: '0.8rem 1rem 0.8rem 2.5rem', 
+                                borderRadius: '12px', 
+                                border: '2px solid var(--beige)',
+                                outline: 'none',
+                                fontSize: '0.95rem'
+                            }}
+                        />
+                    </div>
+                </div>
 
                 {showForm && (
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={handleSubmit} style={{ marginBottom: '2.5rem', padding: '1.5rem', background: 'var(--beige)', borderRadius: '16px' }}>
                         <div className="form-grid">
                             <div className="form-group">
                                 <label>Nom</label>
@@ -85,14 +144,35 @@ function Adherents() {
                                 <input value={form.prenom} onChange={e => setForm({...form, prenom: e.target.value})} required placeholder="Prénom" />
                             </div>
                             <div className="form-group">
-                                <label>Adresse</label>
-                                <input value={form.adresse} onChange={e => setForm({...form, adresse: e.target.value})} required placeholder="Adresse" />
+                                <label>Email Address</label>
+                                <div style={{ position: 'relative' }}>
+                                    <FaEnvelope style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--gray)', fontSize: '0.9rem' }} />
+                                    <input 
+                                        type="email"
+                                        value={form.email} 
+                                        onChange={e => {
+                                            setForm({...form, email: e.target.value});
+                                            if (error) setError('');
+                                        }} 
+                                        required 
+                                        placeholder="user@example.com"
+                                        className={error ? 'input-error' : ''}
+                                        style={{ paddingLeft: '2.5rem' }}
+                                    />
+                                </div>
                             </div>
                             <div className="form-group">
                                 <label>Téléphone</label>
                                 <input value={form.tel} onChange={e => setForm({...form, tel: e.target.value})} required placeholder="Téléphone" />
                             </div>
+                            <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                                <label>Adresse</label>
+                                <input value={form.adresse} onChange={e => setForm({...form, adresse: e.target.value})} required placeholder="Adresse" />
+                            </div>
                         </div>
+                        
+                        {error && <div className="error-message" style={{ marginBottom: '1.5rem' }}>{error}</div>}
+                        
                         <button type="submit" className="btn btn-submit">
                             {editingId ? 'Mettre à jour' : 'Enregistrer'}
                         </button>
@@ -104,27 +184,36 @@ function Adherents() {
                         <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Nom</th>
-                            <th>Prénom</th>
-                            <th>Adresse</th>
+                            <th>Nom & Prénom</th>
+                            <th>Email</th>
                             <th>Téléphone</th>
+                            <th>Adresse</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
                         <tbody>
                         {list.length === 0 ? (
-                            <tr><td colSpan="6" className="empty-state">Aucun adhérent</td></tr>
+                            <tr><td colSpan="6" className="empty-state">Aucun adhérent trouvé</td></tr>
                         ) : (
                             list.map(a => (
                                 <tr key={a.idA}>
                                     <td>{a.idA}</td>
-                                    <td>{a.nom}</td>
-                                    <td>{a.prenom}</td>
-                                    <td>{a.adresse}</td>
-                                    <td>{a.tel}</td>
                                     <td>
-                                        <button className="btn btn-submit" style={{marginRight: '5px', backgroundColor: '#007bff'}} onClick={() => handleEdit(a)}>Éditer</button>
-                                        <button className="btn btn-delete" onClick={() => handleDelete(a.idA)}>Supprimer</button>
+                                        <div style={{ fontWeight: 600, color: 'var(--charcoal)' }}>{a.nom} {a.prenom}</div>
+                                    </td>
+                                    <td>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem' }}>
+                                            <FaEnvelope style={{ color: 'var(--tan)', fontSize: '0.8rem' }} />
+                                            {a.email}
+                                        </div>
+                                    </td>
+                                    <td>{a.tel}</td>
+                                    <td>{a.adresse}</td>
+                                    <td>
+                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                            <button className="btn btn-edit" onClick={() => handleEdit(a)}>Éditer</button>
+                                            <button className="btn btn-delete" onClick={() => handleDelete(a.idA)}>Supprimer</button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))

@@ -14,6 +14,7 @@ export const api = {
     createAdherent: (data) => axios.post(`${API_URL}/adherents`, data),
     updateAdherent: (id, data) => axios.put(`${API_URL}/adherents/${id}`, data),
     deleteAdherent: (id) => axios.delete(`${API_URL}/adherents/${id}`),
+    searchAdherents: (query) => axios.get(`${API_URL}/adherents/search?query=${query}`),
 
     getBibliotheques: () => axios.get(`${API_URL}/bibliotheques`),
     createBibliotheque: (data) => axios.post(`${API_URL}/bibliotheques`, data),
