@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { FaBuilding } from 'react-icons/fa';
 import { api } from '../services/api';
 
 function Bibliotheques() {
@@ -48,7 +49,7 @@ function Bibliotheques() {
     return (
         <div className="container">
             <div className="card">
-                <h2 className="card-title">🏛️ Bibliothèques</h2>
+                <h2 className="card-title"><FaBuilding /> Bibliothèques</h2>
 
                 <button className="btn btn-add" onClick={() => setShowForm(!showForm)}>
                     {showForm ? 'Annuler' : '+ Nouvelle Bibliothèque'}

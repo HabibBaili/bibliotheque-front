@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { FaBook } from 'react-icons/fa';
 import { api } from '../services/api';
 
 function Livres() {
@@ -48,7 +49,7 @@ function Livres() {
     return (
         <div className="container">
             <div className="card">
-                <h2 className="card-title">📖 Livres</h2>
+                <h2 className="card-title"><FaBook /> Livres</h2>
 
                 <button className="btn btn-add" onClick={() => setShowForm(!showForm)}>
                     {showForm ? 'Annuler' : '+ Nouveau Livre'}

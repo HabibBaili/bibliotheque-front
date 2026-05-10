@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { FaUsers } from 'react-icons/fa';
 import { api } from '../services/api';
 
 function Adherents() {
@@ -48,7 +49,7 @@ function Adherents() {
     return (
         <div className="container">
             <div className="card">
-                <h2 className="card-title">👥 Adhérents</h2>
+                <h2 className="card-title"><FaUsers /> Adhérents</h2>
 
                 <button className="btn btn-add" onClick={() => setShowForm(!showForm)}>
                     {showForm ? 'Annuler' : '+ Nouvel Adhérent'}

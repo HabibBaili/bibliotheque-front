@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { FaSync } from 'react-icons/fa';
 import { api } from '../services/api';
 
 function Emprunts() {
@@ -57,7 +58,7 @@ function Emprunts() {
     return (
         <div className="container">
             <div className="card">
-                <h2 className="card-title">🔄 Emprunts</h2>
+                <h2 className="card-title"><FaSync /> Emprunts</h2>
 
                 <button className="btn btn-add" onClick={() => setShowForm(!showForm)}>
                     {showForm ? 'Annuler' : '+ Nouvel Emprunt'}
