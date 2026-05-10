@@ -1,14 +1,37 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FaUsers, FaSearch, FaEnvelope } from 'react-icons/fa';
 import { api } from '../services/api';
+import { useI18n } from '../i18n/I18nContext';
+
+const EMPTY_FORM = { nom: '', prenom: '', adresse: '', tel: '', email: '' };
 
 function Adherents() {
+    const { t, isRtl } = useI18n();
     const [adherents, setAdherents] = useState([]);
-    const [form, setForm] = useState({ nom: '', prenom: '', adresse: '', tel: '', email: '' });
+    const [form, setForm] = useState(EMPTY_FORM);
     const [showForm, setShowForm] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [error, setError] = useState('');
+
+    const loadAdherents = useCallback(async () => {
+        try {
+            const res = await api.getAdherents();
+            setAdherents(Array.isArray(res.data) ? res.data : []);
+        } catch (err) {
+            console.error('Erreur:', err);
+            setAdherents([]);
+        }
+    }, []);
+
+    const handleSearch = useCallback(async () => {
+        try {
+            const res = await api.searchAdherents(searchQuery);
+            setAdherents(Array.isArray(res.data) ? res.data : []);
+        } catch (err) {
+            console.error('Erreur recherche:', err);
+        }
+    }, [searchQuery]);
 
     useEffect(() => {
         if (searchQuery.trim()) {
@@ -16,29 +39,9 @@ function Adherents() {
                 handleSearch();
             }, 300);
             return () => clearTimeout(delayDebounceFn);
-        } else {
-            loadAdherents();
         }
-    }, [searchQuery]);
-
-    const loadAdherents = async () => {
-        try {
-            const res = await api.getAdherents();
-            setAdherents(Array.isArray(res.data) ? res.data : []);
-        } catch (err) {
-            console.error("Erreur:", err);
-            setAdherents([]);
-        }
-    };
-
-    const handleSearch = async () => {
-        try {
-            const res = await api.searchAdherents(searchQuery);
-            setAdherents(Array.isArray(res.data) ? res.data : []);
-        } catch (err) {
-            console.error("Erreur recherche:", err);
-        }
-    };
+        loadAdherents();
+    }, [searchQuery, handleSearch, loadAdherents]);
 
     const validateEmail = (email) => {
         return String(email)
@@ -48,12 +51,18 @@ function Adherents() {
             );
     };
 
+    const resetForm = () => {
+        setForm(EMPTY_FORM);
+        setEditingId(null);
+        setError('');
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
 
         if (!validateEmail(form.email)) {
-            setError("Format d'email invalide");
+            setError(t('members.invalidEmail'));
             return;
         }
 
@@ -63,15 +72,15 @@ function Adherents() {
             } else {
                 await api.createAdherent(form);
             }
-            setForm({ nom: '', prenom: '', adresse: '', tel: '', email: '' });
+            setForm(EMPTY_FORM);
             setShowForm(false);
             setEditingId(null);
             loadAdherents();
         } catch (err) {
             if (err.response && (err.response.status === 409 || err.response.status === 400)) {
-                setError("Email invalide ou déjà utilisé");
+                setError(t('members.emailUsed'));
             } else {
-                alert("Erreur enregistrement adhérent !");
+                alert(t('members.saveError'));
             }
         }
     };
@@ -84,12 +93,12 @@ function Adherents() {
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm('Supprimer cet adhérent ?')) {
+        if (window.confirm(t('members.deleteConfirm'))) {
             try {
                 await api.deleteAdherent(id);
                 loadAdherents();
             } catch (err) {
-                alert("Erreur suppression !");
+                alert(t('members.deleteError'));
             }
         }
     };
@@ -99,31 +108,27 @@ function Adherents() {
     return (
         <div className="container">
             <div className="card">
-                <h2 className="card-title"><FaUsers /> Adhérents</h2>
+                <h2 className="card-title"><FaUsers /> {t('members.title')}</h2>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', gap: '1rem', flexWrap: 'wrap' }}>
                     <button className="btn btn-add" style={{ marginBottom: 0 }} onClick={() => {
-                        if (showForm) {
-                            setForm({ nom: '', prenom: '', adresse: '', tel: '', email: '' });
-                            setEditingId(null);
-                            setError('');
-                        }
+                        if (showForm) resetForm();
                         setShowForm(!showForm);
                     }}>
-                        {showForm ? 'Annuler' : '+ Nouvel Adhérent'}
+                        {showForm ? t('common.cancel') : t('members.add')}
                     </button>
 
                     <div className="search-bar" style={{ flex: 1, maxWidth: '400px', position: 'relative' }}>
-                        <FaSearch style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--gray)' }} />
-                        <input 
-                            type="text" 
-                            placeholder="Rechercher par nom, téléphone ou email..." 
+                        <FaSearch style={{ position: 'absolute', left: isRtl ? 'auto' : '1rem', right: isRtl ? '1rem' : 'auto', top: '50%', transform: 'translateY(-50%)', color: 'var(--gray)' }} />
+                        <input
+                            type="text"
+                            placeholder={t('members.searchPlaceholder')}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            style={{ 
-                                width: '100%', 
-                                padding: '0.8rem 1rem 0.8rem 2.5rem', 
-                                borderRadius: '12px', 
+                            style={{
+                                width: '100%',
+                                padding: isRtl ? '0.8rem 2.5rem 0.8rem 1rem' : '0.8rem 1rem 0.8rem 2.5rem',
+                                borderRadius: '12px',
                                 border: '2px solid var(--beige)',
                                 outline: 'none',
                                 fontSize: '0.95rem'
@@ -136,45 +141,45 @@ function Adherents() {
                     <form onSubmit={handleSubmit} style={{ marginBottom: '2.5rem', padding: '1.5rem', background: 'var(--beige)', borderRadius: '16px' }}>
                         <div className="form-grid">
                             <div className="form-group">
-                                <label>Nom</label>
-                                <input value={form.nom} onChange={e => setForm({...form, nom: e.target.value})} required placeholder="Nom" />
+                                <label>{t('common.name')}</label>
+                                <input value={form.nom} onChange={e => setForm({...form, nom: e.target.value})} required placeholder={t('common.name')} />
                             </div>
                             <div className="form-group">
-                                <label>Prénom</label>
-                                <input value={form.prenom} onChange={e => setForm({...form, prenom: e.target.value})} required placeholder="Prénom" />
+                                <label>{t('members.firstName')}</label>
+                                <input value={form.prenom} onChange={e => setForm({...form, prenom: e.target.value})} required placeholder={t('members.firstName')} />
                             </div>
                             <div className="form-group">
-                                <label>Email Address</label>
+                                <label>{t('members.email')}</label>
                                 <div style={{ position: 'relative' }}>
-                                    <FaEnvelope style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--gray)', fontSize: '0.9rem' }} />
-                                    <input 
+                                    <FaEnvelope style={{ position: 'absolute', left: isRtl ? 'auto' : '1rem', right: isRtl ? '1rem' : 'auto', top: '50%', transform: 'translateY(-50%)', color: 'var(--gray)', fontSize: '0.9rem' }} />
+                                    <input
                                         type="email"
-                                        value={form.email} 
+                                        value={form.email}
                                         onChange={e => {
                                             setForm({...form, email: e.target.value});
                                             if (error) setError('');
-                                        }} 
-                                        required 
+                                        }}
+                                        required
                                         placeholder="user@example.com"
                                         className={error ? 'input-error' : ''}
-                                        style={{ paddingLeft: '2.5rem' }}
+                                        style={isRtl ? { paddingRight: '2.5rem' } : { paddingLeft: '2.5rem' }}
                                     />
                                 </div>
                             </div>
                             <div className="form-group">
-                                <label>Téléphone</label>
-                                <input value={form.tel} onChange={e => setForm({...form, tel: e.target.value})} required placeholder="Téléphone" />
+                                <label>{t('members.phone')}</label>
+                                <input value={form.tel} onChange={e => setForm({...form, tel: e.target.value})} required placeholder={t('members.phone')} />
                             </div>
                             <div className="form-group" style={{ gridColumn: 'span 2' }}>
-                                <label>Adresse</label>
-                                <input value={form.adresse} onChange={e => setForm({...form, adresse: e.target.value})} required placeholder="Adresse" />
+                                <label>{t('common.address')}</label>
+                                <input value={form.adresse} onChange={e => setForm({...form, adresse: e.target.value})} required placeholder={t('common.address')} />
                             </div>
                         </div>
-                        
+
                         {error && <div className="error-message" style={{ marginBottom: '1.5rem' }}>{error}</div>}
-                        
+
                         <button type="submit" className="btn btn-submit">
-                            {editingId ? 'Mettre à jour' : 'Enregistrer'}
+                            {editingId ? t('common.update') : t('common.save')}
                         </button>
                     </form>
                 )}
@@ -183,17 +188,17 @@ function Adherents() {
                     <table>
                         <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Nom & Prénom</th>
-                            <th>Email</th>
-                            <th>Téléphone</th>
-                            <th>Adresse</th>
-                            <th>Actions</th>
+                            <th>{t('common.id')}</th>
+                            <th>{t('members.fullName')}</th>
+                            <th>{t('members.email')}</th>
+                            <th>{t('members.phone')}</th>
+                            <th>{t('common.address')}</th>
+                            <th>{t('common.actions')}</th>
                         </tr>
                         </thead>
                         <tbody>
                         {list.length === 0 ? (
-                            <tr><td colSpan="6" className="empty-state">Aucun adhérent trouvé</td></tr>
+                            <tr><td colSpan="6" className="empty-state">{t('members.empty')}</td></tr>
                         ) : (
                             list.map(a => (
                                 <tr key={a.idA}>
@@ -211,8 +216,8 @@ function Adherents() {
                                     <td>{a.adresse}</td>
                                     <td>
                                         <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                            <button className="btn btn-edit" onClick={() => handleEdit(a)}>Éditer</button>
-                                            <button className="btn btn-delete" onClick={() => handleDelete(a.idA)}>Supprimer</button>
+                                            <button className="btn btn-edit" onClick={() => handleEdit(a)}>{t('common.edit')}</button>
+                                            <button className="btn btn-delete" onClick={() => handleDelete(a.idA)}>{t('common.delete')}</button>
                                         </div>
                                     </td>
                                 </tr>

@@ -35,6 +35,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1.5rem;
   box-shadow: var(--soft-shadow);
   position: sticky;
   top: 0;
@@ -88,6 +89,50 @@ body {
 
 .nav-links a:hover::after {
   width: 100%;
+}
+
+.language-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--gray);
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.language-switch select {
+  border: 2px solid var(--beige);
+  border-radius: 10px;
+  background: var(--warm-white);
+  color: var(--charcoal);
+  padding: 0.45rem 0.65rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.language-switch select:focus {
+  outline: none;
+  border-color: var(--tan);
+  box-shadow: 0 0 0 4px rgba(201, 168, 124, 0.1);
+}
+
+html[dir="rtl"] body {
+  direction: rtl;
+}
+
+html[dir="rtl"] th {
+  text-align: right;
+}
+
+html[dir="rtl"] .livres-search-icon {
+  left: auto;
+  right: 1rem;
+}
+
+html[dir="rtl"] .livres-search input {
+  padding: 0.9rem 2.6rem 0.9rem 1.2rem;
 }
 
 /* Container */
@@ -525,11 +570,18 @@ tr:hover td {
 
   .navbar {
     padding: 1rem 1.5rem;
+    flex-wrap: wrap;
   }
 
   .nav-links {
     gap: 1rem;
     font-size: 0.8rem;
+    flex-wrap: wrap;
+  }
+
+  .language-switch {
+    width: 100%;
+    justify-content: flex-end;
   }
 
   .livres-header,
