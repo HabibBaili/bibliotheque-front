@@ -3,7 +3,8 @@ import axios from 'axios';
 const API_URL = 'http://localhost:8080/api';
 
 export const api = {
-    getLivres: () => axios.get(`${API_URL}/livres`),
+    getLivres: (categorie) => axios.get(`${API_URL}/livres${categorie ? `?categorie=${categorie}` : ''}`),
+    getCategories: () => axios.get(`${API_URL}/livres/categories`),
     getLivre: (id) => axios.get(`${API_URL}/livres/${id}`),
     createLivre: (data) => axios.post(`${API_URL}/livres`, data),
     updateLivre: (id, data) => axios.put(`${API_URL}/livres/${id}`, data),

@@ -381,6 +381,114 @@ tr:hover td {
   border-radius: 10px;
 }
 
+/* Livres catalog */
+.livres-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.livres-header .card-title,
+.livres-add-btn {
+  margin-bottom: 0;
+}
+
+.livres-page-error {
+  margin-bottom: 1.5rem;
+}
+
+.livres-form {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--cream);
+  border: 1px solid var(--beige);
+  border-radius: 16px;
+  animation: fadeIn 0.3s ease;
+}
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.livres-toolbar {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(220px, 320px) auto;
+  align-items: end;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.livres-search {
+  position: relative;
+}
+
+.livres-search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gray);
+  font-size: 0.9rem;
+}
+
+.livres-search input {
+  width: 100%;
+  padding: 0.9rem 1.2rem 0.9rem 2.6rem;
+  border: 2px solid var(--beige);
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-family: 'Inter', sans-serif;
+  color: var(--charcoal);
+  background: var(--warm-white);
+  transition: all 0.3s;
+}
+
+.livres-search input:focus {
+  outline: none;
+  border-color: var(--tan);
+  box-shadow: 0 0 0 4px rgba(201, 168, 124, 0.1);
+}
+
+.livres-filter label {
+  margin-bottom: 0.4rem;
+}
+
+.livres-reset-btn {
+  align-self: end;
+  min-height: 47px;
+}
+
+.livres-table th,
+.livres-table td {
+  vertical-align: middle;
+}
+
+.livre-title {
+  color: var(--charcoal);
+  font-weight: 600;
+  min-width: 160px;
+}
+
+.livre-id {
+  margin-top: 0.15rem;
+  color: var(--gray);
+  font-size: 0.78rem;
+}
+
+.category-pill {
+  display: inline-block;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
 /* Empty state */
 .empty-state {
   text-align: center;
@@ -422,6 +530,26 @@ tr:hover td {
   .nav-links {
     gap: 1rem;
     font-size: 0.8rem;
+  }
+
+  .livres-header,
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .livres-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .livres-reset-btn,
+  .livres-add-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .category-pill {
+    max-width: 180px;
   }
 }
 
