@@ -6,6 +6,7 @@ function Adherents() {
     const [adherents, setAdherents] = useState([]);
     const [form, setForm] = useState({ nom: '', prenom: '', adresse: '', tel: '' });
     const [showForm, setShowForm] = useState(false);
+    const [editingId, setEditingId] = useState(null);
 
     useEffect(() => {
         loadAdherents();
@@ -24,13 +25,24 @@ function Adherents() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await api.createAdherent(form);
+            if (editingId) {
+                await api.updateAdherent(editingId, form);
+            } else {
+                await api.createAdherent(form);
+            }
             setForm({ nom: '', prenom: '', adresse: '', tel: '' });
             setShowForm(false);
+            setEditingId(null);
             loadAdherents();
         } catch (err) {
-            alert("Erreur création adhérent !");
+            alert("Erreur enregistrement adhérent !");
         }
+    };
+
+    const handleEdit = (a) => {
+        setForm({ nom: a.nom, prenom: a.prenom, adresse: a.adresse, tel: a.tel });
+        setEditingId(a.idA);
+        setShowForm(true);
     };
 
     const handleDelete = async (id) => {
@@ -51,7 +63,13 @@ function Adherents() {
             <div className="card">
                 <h2 className="card-title"><FaUsers /> Adhérents</h2>
 
-                <button className="btn btn-add" onClick={() => setShowForm(!showForm)}>
+                <button className="btn btn-add" onClick={() => {
+                    if (showForm) {
+                        setForm({ nom: '', prenom: '', adresse: '', tel: '' });
+                        setEditingId(null);
+                    }
+                    setShowForm(!showForm);
+                }}>
                     {showForm ? 'Annuler' : '+ Nouvel Adhérent'}
                 </button>
 
@@ -75,7 +93,9 @@ function Adherents() {
                                 <input value={form.tel} onChange={e => setForm({...form, tel: e.target.value})} required placeholder="Téléphone" />
                             </div>
                         </div>
-                        <button type="submit" className="btn btn-submit">Enregistrer</button>
+                        <button type="submit" className="btn btn-submit">
+                            {editingId ? 'Mettre à jour' : 'Enregistrer'}
+                        </button>
                     </form>
                 )}
 
@@ -103,6 +123,7 @@ function Adherents() {
                                     <td>{a.adresse}</td>
                                     <td>{a.tel}</td>
                                     <td>
+                                        <button className="btn btn-submit" style={{marginRight: '5px', backgroundColor: '#007bff'}} onClick={() => handleEdit(a)}>Éditer</button>
                                         <button className="btn btn-delete" onClick={() => handleDelete(a.idA)}>Supprimer</button>
                                     </td>
                                 </tr>

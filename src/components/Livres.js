@@ -7,6 +7,7 @@ function Livres() {
     const [bibliotheques, setBibliotheques] = useState([]);
     const [form, setForm] = useState({ titre: '', auteur: '', isbn: '', anneePublication: '', bibliothequeId: '', quantite: 1 });
     const [showForm, setShowForm] = useState(false);
+    const [editingId, setEditingId] = useState(null);
 
     useEffect(() => {
         loadLivres();
@@ -40,13 +41,31 @@ function Livres() {
                 ...form,
                 bibliotheque: form.bibliothequeId ? { idB: parseInt(form.bibliothequeId) } : null
             };
-            await api.createLivre(dataToSubmit);
+            if (editingId) {
+                await api.updateLivre(editingId, dataToSubmit);
+            } else {
+                await api.createLivre(dataToSubmit);
+            }
             setForm({ titre: '', auteur: '', isbn: '', anneePublication: '', bibliothequeId: '', quantite: 1 });
             setShowForm(false);
+            setEditingId(null);
             loadLivres();
         } catch (err) {
-            alert("Erreur création livre !");
+            alert("Erreur enregistrement livre !");
         }
+    };
+
+    const handleEdit = (l) => {
+        setForm({
+            titre: l.titre,
+            auteur: l.auteur,
+            isbn: l.isbn,
+            anneePublication: l.anneePublication,
+            quantite: l.quantite,
+            bibliothequeId: l.bibliotheque ? l.bibliotheque.idB : ''
+        });
+        setEditingId(l.idLivre);
+        setShowForm(true);
     };
 
     const handleDelete = async (id) => {
@@ -67,7 +86,13 @@ function Livres() {
             <div className="card">
                 <h2 className="card-title"><FaBook /> Livres</h2>
 
-                <button className="btn btn-add" onClick={() => setShowForm(!showForm)}>
+                <button className="btn btn-add" onClick={() => {
+                    if (showForm) {
+                        setForm({ titre: '', auteur: '', isbn: '', anneePublication: '', bibliothequeId: '', quantite: 1 });
+                        setEditingId(null);
+                    }
+                    setShowForm(!showForm);
+                }}>
                     {showForm ? 'Annuler' : '+ Nouveau Livre'}
                 </button>
 
@@ -104,7 +129,9 @@ function Livres() {
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" className="btn btn-submit">Enregistrer</button>
+                        <button type="submit" className="btn btn-submit">
+                            {editingId ? 'Mettre à jour' : 'Enregistrer'}
+                        </button>
                     </form>
                 )}
 
@@ -138,6 +165,7 @@ function Livres() {
                                     <td>{l.quantiteDisponible}</td>
                                     <td>{l.bibliotheque ? l.bibliotheque.nomB : '-'}</td>
                                     <td>
+                                        <button className="btn btn-submit" style={{marginRight: '5px', backgroundColor: '#007bff'}} onClick={() => handleEdit(l)}>Éditer</button>
                                         <button className="btn btn-delete" onClick={() => handleDelete(l.idLivre)}>Supprimer</button>
                                     </td>
                                 </tr>
