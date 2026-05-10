@@ -4,12 +4,24 @@ import { api } from '../services/api';
 
 function Livres() {
     const [livres, setLivres] = useState([]);
-    const [form, setForm] = useState({ titre: '', auteur: '', isbn: '', anneePublication: '' });
+    const [bibliotheques, setBibliotheques] = useState([]);
+    const [form, setForm] = useState({ titre: '', auteur: '', isbn: '', anneePublication: '', bibliothequeId: '' });
     const [showForm, setShowForm] = useState(false);
 
     useEffect(() => {
         loadLivres();
+        loadBibliotheques();
     }, []);
+
+    const loadBibliotheques = async () => {
+        try {
+            const res = await api.getBibliotheques();
+            setBibliotheques(Array.isArray(res.data) ? res.data : []);
+        } catch (err) {
+            console.error("Erreur bibliothèques:", err);
+            setBibliotheques([]);
+        }
+    };
 
     const loadLivres = async () => {
         try {
@@ -24,8 +36,12 @@ function Livres() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await api.createLivre(form);
-            setForm({ titre: '', auteur: '', isbn: '', anneePublication: '' });
+            const dataToSubmit = {
+                ...form,
+                bibliotheque: form.bibliothequeId ? { idB: parseInt(form.bibliothequeId) } : null
+            };
+            await api.createLivre(dataToSubmit);
+            setForm({ titre: '', auteur: '', isbn: '', anneePublication: '', bibliothequeId: '' });
             setShowForm(false);
             loadLivres();
         } catch (err) {
@@ -74,6 +90,15 @@ function Livres() {
                                 <label>Année</label>
                                 <input type="number" value={form.anneePublication} onChange={e => setForm({...form, anneePublication: e.target.value})} required placeholder="2024" />
                             </div>
+                            <div className="form-group">
+                                <label>Bibliothèque</label>
+                                <select value={form.bibliothequeId} onChange={e => setForm({...form, bibliothequeId: e.target.value})} required>
+                                    <option value="">Sélectionner une bibliothèque</option>
+                                    {bibliotheques.map(b => (
+                                        <option key={b.idB} value={b.idB}>{b.nomB}</option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
                         <button type="submit" className="btn btn-submit">Enregistrer</button>
                     </form>
@@ -88,12 +113,13 @@ function Livres() {
                             <th>Auteur</th>
                             <th>ISBN</th>
                             <th>Année</th>
+                            <th>Bibliothèque</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
                         <tbody>
                         {list.length === 0 ? (
-                            <tr><td colSpan="6" className="empty-state">Aucun livre</td></tr>
+                            <tr><td colSpan="7" className="empty-state">Aucun livre</td></tr>
                         ) : (
                             list.map(l => (
                                 <tr key={l.idLivre}>
@@ -102,6 +128,7 @@ function Livres() {
                                     <td>{l.auteur}</td>
                                     <td>{l.isbn}</td>
                                     <td>{l.anneePublication}</td>
+                                    <td>{l.bibliotheque ? l.bibliotheque.nomB : '-'}</td>
                                     <td>
                                         <button className="btn btn-delete" onClick={() => handleDelete(l.idLivre)}>Supprimer</button>
                                     </td>
