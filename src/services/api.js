@@ -23,4 +23,7 @@ export const api = {
     createEmprunt: (data) => axios.post(`${API_URL}/emprunts`, data),
     deleteEmprunt: (id) => axios.delete(`${API_URL}/emprunts/${id}`),
     retournerEmprunt: (id) => axios.put(`${API_URL}/emprunts/${id}/retour`),
+    retournerLigne: (empruntId, ligneId) => axios.put(`${API_URL}/emprunts/${empruntId}/retour/ligne/${ligneId}`),
+    getEmpruntsEnRetard: () => axios.get(`${API_URL}/emprunts/en-retard`),
+    getEmpruntsByAdherent: (adherentId) => axios.get(`${API_URL}/emprunts/adherent/${adherentId}`),
 };
