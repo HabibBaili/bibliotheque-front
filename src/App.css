@@ -407,6 +407,35 @@ tr:hover td {
   box-shadow: 0 0 0 4px rgba(201, 168, 124, 0.1);
 }
 
+.phone-input {
+  padding: 0.9rem 1.2rem;
+  border: 2px solid var(--beige);
+  border-radius: 12px;
+  background: var(--warm-white);
+  transition: all 0.3s;
+}
+
+.phone-input:focus-within {
+  border-color: var(--tan);
+  box-shadow: 0 0 0 4px rgba(201, 168, 124, 0.1);
+}
+
+.phone-input .PhoneInputInput {
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+.phone-input .PhoneInputInput:focus {
+  box-shadow: none;
+}
+
+.phone-input.input-error {
+  border-color: #c02f1d;
+  box-shadow: 0 0 0 4px rgba(192, 47, 29, 0.12);
+}
+
 .form-group.form-error label {
   color: #c02f1d;
 }

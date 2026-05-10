@@ -177,6 +177,7 @@ export const translations = {
             searchPlaceholder: 'Rechercher par nom, téléphone ou email...',
             empty: 'Aucun adhérent trouvé',
             invalidEmail: "Format d'email invalide",
+            invalidPhone: 'Numéro de téléphone invalide',
             emailUsed: 'Email invalide ou déjà utilisé',
             saveError: 'Erreur enregistrement adhérent !',
             deleteConfirm: 'Supprimer cet adhérent ?',
@@ -262,7 +263,7 @@ export const translations = {
             availability: { unavailable: 'غير متوفر', lowStock: 'مخزون منخفض: {{count}}', available: 'متوفر: {{count}}' },
             categories: categoryLabels.ar
         },
-        members: { title: 'الأعضاء', add: '+ عضو جديد', fullName: 'الاسم واللقب', firstName: 'اللقب', email: 'البريد الإلكتروني', phone: 'الهاتف', searchPlaceholder: 'ابحث بالاسم أو الهاتف أو البريد...', empty: 'لم يتم العثور على أعضاء', invalidEmail: 'صيغة البريد الإلكتروني غير صحيحة', emailUsed: 'البريد غير صحيح أو مستخدم سابقا', saveError: 'خطأ في حفظ العضو!', deleteConfirm: 'هل تريد حذف هذا العضو؟', deleteError: 'خطأ في الحذف!' },
+        members: { title: 'الأعضاء', add: '+ عضو جديد', fullName: 'الاسم واللقب', firstName: 'اللقب', email: 'البريد الإلكتروني', phone: 'الهاتف', searchPlaceholder: 'ابحث بالاسم أو الهاتف أو البريد...', empty: 'لم يتم العثور على أعضاء', invalidEmail: 'صيغة البريد الإلكتروني غير صحيحة', invalidPhone: 'رقم الهاتف غير صحيح', emailUsed: 'البريد غير صحيح أو مستخدم سابقا', saveError: 'خطأ في حفظ العضو!', deleteConfirm: 'هل تريد حذف هذا العضو؟', deleteError: 'خطأ في الحذف!' },
         loans: {
             title: 'الإعارات',
             tabs: { all: 'كل الإعارات', overdue: 'متأخرة', history: 'السجل' },
@@ -290,7 +291,7 @@ export const translations = {
             availability: { unavailable: 'Unavailable', lowStock: 'Low stock: {{count}}', available: 'Available: {{count}}' },
             categories: categoryLabels.en
         },
-        members: { title: 'Members', add: '+ New member', fullName: 'Name & first name', firstName: 'First name', email: 'Email address', phone: 'Phone', searchPlaceholder: 'Search by name, phone, or email...', empty: 'No members found', invalidEmail: 'Invalid email format', emailUsed: 'Email is invalid or already used', saveError: 'Member save error!', deleteConfirm: 'Delete this member?', deleteError: 'Deletion error!' },
+        members: { title: 'Members', add: '+ New member', fullName: 'Name & first name', firstName: 'First name', email: 'Email address', phone: 'Phone', searchPlaceholder: 'Search by name, phone, or email...', empty: 'No members found', invalidEmail: 'Invalid email format', invalidPhone: 'Invalid phone number', emailUsed: 'Email is invalid or already used', saveError: 'Member save error!', deleteConfirm: 'Delete this member?', deleteError: 'Deletion error!' },
         loans: {
             title: 'Loans',
             tabs: { all: 'All loans', overdue: 'Overdue', history: 'History' },
@@ -318,7 +319,7 @@ export const translations = {
             availability: { unavailable: 'Nicht verfügbar', lowStock: 'Niedriger Bestand: {{count}}', available: 'Verfügbar: {{count}}' },
             categories: categoryLabels.de
         },
-        members: { title: 'Mitglieder', add: '+ Neues Mitglied', fullName: 'Name & Vorname', firstName: 'Vorname', email: 'E-Mail-Adresse', phone: 'Telefon', searchPlaceholder: 'Nach Name, Telefon oder E-Mail suchen...', empty: 'Keine Mitglieder gefunden', invalidEmail: 'Ungültiges E-Mail-Format', emailUsed: 'E-Mail ist ungültig oder bereits vergeben', saveError: 'Fehler beim Speichern des Mitglieds!', deleteConfirm: 'Dieses Mitglied löschen?', deleteError: 'Fehler beim Löschen!' },
+        members: { title: 'Mitglieder', add: '+ Neues Mitglied', fullName: 'Name & Vorname', firstName: 'Vorname', email: 'E-Mail-Adresse', phone: 'Telefon', searchPlaceholder: 'Nach Name, Telefon oder E-Mail suchen...', empty: 'Keine Mitglieder gefunden', invalidEmail: 'Ungültiges E-Mail-Format', invalidPhone: 'Ungültige Telefonnummer', emailUsed: 'E-Mail ist ungültig oder bereits vergeben', saveError: 'Fehler beim Speichern des Mitglieds!', deleteConfirm: 'Dieses Mitglied löschen?', deleteError: 'Fehler beim Löschen!' },
         loans: {
             title: 'Ausleihen',
             tabs: { all: 'Alle Ausleihen', overdue: 'Überfällig', history: 'Historie' },

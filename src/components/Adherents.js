@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { FaUsers, FaSearch, FaEnvelope } from 'react-icons/fa';
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
 import { api } from '../services/api';
 import { useI18n } from '../i18n/I18nContext';
 
@@ -13,6 +15,7 @@ function Adherents() {
     const [editingId, setEditingId] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [error, setError] = useState('');
+    const [phoneError, setPhoneError] = useState('');
 
     const loadAdherents = useCallback(async () => {
         try {
@@ -55,14 +58,21 @@ function Adherents() {
         setForm(EMPTY_FORM);
         setEditingId(null);
         setError('');
+        setPhoneError('');
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        setPhoneError('');
 
         if (!validateEmail(form.email)) {
             setError(t('members.invalidEmail'));
+            return;
+        }
+
+        if (!form.tel || !isValidPhoneNumber(form.tel)) {
+            setPhoneError(t('members.invalidPhone'));
             return;
         }
 
@@ -75,6 +85,7 @@ function Adherents() {
             setForm(EMPTY_FORM);
             setShowForm(false);
             setEditingId(null);
+            setPhoneError('');
             loadAdherents();
         } catch (err) {
             if (err.response && (err.response.status === 409 || err.response.status === 400)) {
@@ -90,6 +101,7 @@ function Adherents() {
         setEditingId(a.idA);
         setShowForm(true);
         setError('');
+        setPhoneError('');
     };
 
     const handleDelete = async (id) => {
@@ -166,9 +178,21 @@ function Adherents() {
                                     />
                                 </div>
                             </div>
-                            <div className="form-group">
+                            <div className={`form-group ${phoneError ? 'form-error' : ''}`}>
                                 <label>{t('members.phone')}</label>
-                                <input value={form.tel} onChange={e => setForm({...form, tel: e.target.value})} required placeholder={t('members.phone')} />
+                                <PhoneInput
+                                    international
+                                    defaultCountry="DZ"
+                                    value={form.tel}
+                                    onChange={value => {
+                                        setForm({...form, tel: value || ''});
+                                        if (phoneError) setPhoneError('');
+                                    }}
+                                    required
+                                    placeholder={t('members.phone')}
+                                    className={`phone-input ${phoneError ? 'input-error' : ''}`}
+                                />
+                                {phoneError && <div className="error-message" role="alert">{phoneError}</div>}
                             </div>
                             <div className="form-group" style={{ gridColumn: 'span 2' }}>
                                 <label>{t('common.address')}</label>
