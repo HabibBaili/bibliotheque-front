@@ -48,6 +48,7 @@ body {
   font-weight: 700;
   color: var(--charcoal);
   letter-spacing: -0.5px;
+  text-decoration: none;
 }
 
 .logo span {

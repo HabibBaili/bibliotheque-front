@@ -7,9 +7,9 @@ function Navbar() {
 
     return (
         <nav className="navbar">
-            <div className="logo">
+            <Link to="/" className="logo">
                 <span>◆</span> Book Hunter
-            </div>
+            </Link>
             <ul className="nav-links">
                 <li><Link to="/">{t('nav.home')}</Link></li>
                 <li><Link to="/bibliotheques">{t('nav.libraries')}</Link></li>
