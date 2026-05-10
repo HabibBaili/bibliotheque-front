@@ -362,6 +362,25 @@ tr:hover td {
   box-shadow: 0 0 0 4px rgba(201, 168, 124, 0.1);
 }
 
+.form-group.form-error label {
+  color: #c02f1d;
+}
+
+.input-error {
+  border-color: #c02f1d;
+  box-shadow: 0 0 0 4px rgba(192, 47, 29, 0.12);
+}
+
+.error-message {
+  margin-top: 0.5rem;
+  color: #c02f1d;
+  font-size: 0.88rem;
+  line-height: 1.4;
+  background: rgba(192, 47, 29, 0.08);
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
+}
+
 /* Empty state */
 .empty-state {
   text-align: center;

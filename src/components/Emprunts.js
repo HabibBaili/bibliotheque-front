@@ -8,6 +8,7 @@ function Emprunts() {
     const [adherents, setAdherents] = useState([]);
     const [form, setForm] = useState({ livreId: '', adherentId: '', dateE: '', dateRetourPrevue: '' });
     const [showForm, setShowForm] = useState(false);
+    const [errors, setErrors] = useState({});
 
     useEffect(() => {
         loadAll();
@@ -31,12 +32,28 @@ function Emprunts() {
         }
     };
 
+    const validateDates = (nextForm = form) => {
+        const newErrors = {};
+        if (nextForm.dateE && nextForm.dateRetourPrevue) {
+            if (new Date(nextForm.dateRetourPrevue) <= new Date(nextForm.dateE)) {
+                newErrors.dateRetourPrevue = 'La date de retour prévue doit être après la date d\'emprunt.';
+            }
+        }
+        setErrors(newErrors);
+        return newErrors;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const validationErrors = validateDates(form);
+        if (Object.keys(validationErrors).length > 0) {
+            return;
+        }
         try {
             await api.createEmprunt(form);
             setForm({ livreId: '', adherentId: '', dateE: '', dateRetourPrevue: '' });
             setShowForm(false);
+            setErrors({});
             loadAll();
         } catch (err) {
             alert("Erreur création emprunt !");
@@ -60,7 +77,7 @@ function Emprunts() {
             <div className="card">
                 <h2 className="card-title"><FaSync /> Emprunts</h2>
 
-                <button className="btn btn-add" onClick={() => setShowForm(!showForm)}>
+                <button className="btn btn-add" onClick={() => { setShowForm(!showForm); if (showForm) setErrors({}); }}>
                     {showForm ? 'Annuler' : '+ Nouvel Emprunt'}
                 </button>
 
@@ -83,11 +100,36 @@ function Emprunts() {
                             </div>
                             <div className="form-group">
                                 <label>Date Emprunt</label>
-                                <input type="date" value={form.dateE} onChange={e => setForm({...form, dateE: e.target.value})} required />
+                                <input
+                                    type="date"
+                                    value={form.dateE}
+                                    onChange={e => {
+                                        const nextForm = { ...form, dateE: e.target.value };
+                                        setForm(nextForm);
+                                        validateDates(nextForm);
+                                    }}
+                                    required
+                                />
                             </div>
-                            <div className="form-group">
+                            <div className={`form-group${errors.dateRetourPrevue ? ' form-error' : ''}`}>
                                 <label>Retour Prévu</label>
-                                <input type="date" value={form.dateRetourPrevue} onChange={e => setForm({...form, dateRetourPrevue: e.target.value})} required />
+                                <input
+                                    type="date"
+                                    className={errors.dateRetourPrevue ? 'input-error' : ''}
+                                    value={form.dateRetourPrevue}
+                                    onChange={e => {
+                                        const nextForm = { ...form, dateRetourPrevue: e.target.value };
+                                        setForm(nextForm);
+                                        validateDates(nextForm);
+                                    }}
+                                    aria-invalid={errors.dateRetourPrevue ? 'true' : 'false'}
+                                    required
+                                />
+                                {errors.dateRetourPrevue && (
+                                    <div className="error-message" role="alert">
+                                        {errors.dateRetourPrevue}
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <button type="submit" className="btn btn-submit">Enregistrer</button>
